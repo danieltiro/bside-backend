@@ -1,0 +1,3 @@
+INSERT INTO bside_student (bside_uuid, bside_active, bside_created, bside_birthday, bside_curp, bside_name, bside_lastname) VALUES (uuid_generate_v4(), true, now(), now(), 'TIBD841213HMCRRN05', 'Daniel', 'Tiro');
+INSERT INTO bside_student (bside_uuid, bside_active, bside_created, bside_birthday, bside_curp, bside_name, bside_lastname) VALUES (uuid_generate_v4(), true, now(), now(), 'TIBD841214HMCRRN06', 'Pedro', 'Tiro');
+INSERT INTO bside_student (bside_uuid, bside_active, bside_created, bside_birthday, bside_curp, bside_name, bside_lastname) VALUES (uuid_generate_v4(), true, now(), now(), 'TIBD841215HMCRRN07', 'Manuel', 'Tiro');
