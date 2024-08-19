@@ -2,6 +2,8 @@ package com.bside.demo.controller;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +28,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.bside.demo.entity.Attachment;
 import com.bside.demo.entity.Student;
 import com.bside.demo.exception.StudentAlreadyExistsException;
 import com.bside.demo.exception.StudentArgumentNotValidException;
@@ -39,7 +44,7 @@ import com.bside.demo.service.IStudentService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
-@CrossOrigin(origins = {"*"})
+@CrossOrigin(origins = { "*", "*" })
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/student")
@@ -71,6 +76,32 @@ public class StudentController {
 			throw new StudentAlreadyExistsException("Student already exists with curp: " + entity.getCurp());
 		}
 		return studentService.save(entity);
+	}
+	
+	@PostMapping(value="/attachments", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<HashMap<String, Object>> saveWithAttachments(
+    			@RequestPart(required = false, value ="files") final MultipartFile[] files,
+    			@RequestPart(required = true, value ="student") final Student entity,
+    			@RequestPart(required = false, value = "key") String key,
+    			@RequestPart(required = false, value = "description") String description
+    		) {
+		
+		Student student = studentService.findByCurpAndActive(entity.getCurp(), true).orElse(null);
+		if (student != null) {
+			throw new StudentAlreadyExistsException("Student already exists with curp: " + entity.getCurp());
+		}
+		
+		return new ResponseEntity<>(studentService.saveWithAttachments(entity, files, key, description), HttpStatus.CREATED);
+	}
+	
+	@PutMapping(value="/attachments", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<HashMap<String, Object>> updateWithAttachments(
+    			@RequestPart(required = false, value = "files") MultipartFile[] files,
+    			@RequestPart(required = true, value ="student") final Student entity,
+    			@RequestPart(required = false, value = "key") String key,
+    			@RequestPart(required = false, value = "description") String description
+    		) {
+		return new ResponseEntity<>(studentService.saveWithAttachments(entity, files, key, description), HttpStatus.OK);
 	}
 	
 	@PutMapping()
@@ -107,6 +138,7 @@ public class StudentController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 		headers.setBearerAuth(token);
+		headers.set("x-sandbox", "true");
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 		if (response.getStatusCode() == HttpStatus.OK) {

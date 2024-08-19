@@ -1,9 +1,7 @@
 package com.bside.demo.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
@@ -16,11 +14,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -28,11 +26,9 @@ import lombok.Data;
 
 @JsonPropertyOrder(alphabetic=true)
 @Data
-@Table(name = Constants.DB_PREFIX + "_student", uniqueConstraints = {
-		@UniqueConstraint(name = "idxStudent_Unique", columnNames = { Constants.DB_PREFIX + "_curp"})
-})
+@Table(name = Constants.DB_PREFIX + "_attachment")
 @Entity
-public class Student implements Serializable {
+public class Attachment implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -48,14 +44,27 @@ public class Student implements Serializable {
 	
 	@NotNull
 	@Size(min = 1, max = 255)
-	@Column(name = Constants.DB_PREFIX + "_lastname", length = 255)
-	private String lastname;
+	@Column(name = Constants.DB_PREFIX + "_key", length = 255)
+	private String key;
 	
 	@NotNull
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = Constants.DB_PREFIX + "_birthday")
-	private Date birthday;
+	@Size(min = 1, max = 255)
+	@Column(name = Constants.DB_PREFIX + "_content_type", length = 255)
+	private String contentType;
 	
+	@NotNull
+	@Size(min = 1, max = 255)
+	@Column(name = Constants.DB_PREFIX + "_extension", length = 255)
+	private String extension;
+	
+	@Size(min = 1, max = 1000)
+	@Column(name = Constants.DB_PREFIX + "_description", length = 1000)
+	private String description;
+	
+	@NotNull
+	@Column(name = Constants.DB_PREFIX + "_size")
+	private Double size;
+
 	@NotNull
 	@Column(name = Constants.DB_PREFIX + "_active")
 	private Boolean active = true;
@@ -73,29 +82,22 @@ public class Student implements Serializable {
 	@Column(name = Constants.DB_PREFIX + "_modified")
 	private Date modified;
 	
-	@NotNull
-	@Size(min = 18, max = 18)
-	@Column(name = Constants.DB_PREFIX + "_curp", length = 18)
-	private String curp;
-	
 	@JsonIgnore
-	@OneToMany(mappedBy="student", fetch = FetchType.LAZY)
-    private List<Attachment> attachments = new ArrayList<>();
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = Constants.DB_PREFIX + "_student")
+    private Student student;
 	
-	@Column(name = Constants.DB_PREFIX + "_avatar", length = 255)
-	private String avatar;
-	
-	public Student() {
+	public Attachment() {
 		
 	}
 	
-	public Student(String name, String lastname, String curp, Boolean active, Date created, Date birthday) {
+	public Attachment(String name, String key, String description, Double size, Boolean active, Date created) {
 		this.name = name;
-		this.lastname = lastname;
-		this.curp = curp;
+		this.key = key;
+		this.description = description;
+		this.size = size;
 		this.active = active;
 		this.created = created;
-		this.birthday = birthday;
 	}
 	
 	@Override
@@ -106,11 +108,11 @@ public class Student implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final Student other = (Student) obj;
-        if (curp == null) {
-            if (other.curp != null)
+        final Attachment other = (Attachment) obj;
+        if (name == null) {
+            if (other.name != null)
                 return false;
-        } else if (!curp.equals(curp))
+        } else if (!name.equals(name))
             return false;
         return true;
     }
@@ -119,8 +121,7 @@ public class Student implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
         int result = 1;
-        result = prime * result + ((curp == null) ? 0 : curp.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
         return result;
 	}
-
 }
