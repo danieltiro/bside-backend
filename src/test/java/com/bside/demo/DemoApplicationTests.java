@@ -69,7 +69,7 @@ class DemoApplicationTests {
 		Student student2 = studentService.findByCurpAndActive("TIBD841213HMCRNN01", true).orElse(null);
 		assertThat(student2).isNotNull();
 		assertEquals(student2.getCurp(), student.getCurp());
-		verify(studentRepository).findByCurpAndActive("TIBD841213HMCRNN01", true);
+		verify(studentRepository).findByCurpIgnoreCaseAndActive("TIBD841213HMCRNN01", true);
 	}
 	
 	@Test
@@ -118,6 +118,6 @@ class DemoApplicationTests {
 	void testThrowStudentNotFoundExceptionOnSaveStudent() {
 		when(studentService.findByCurpAndActive("TIBD841213HMCRNN01", true)).thenThrow(new StudentNotFoundException(""));
 		assertThatThrownBy(() -> studentService.findByCurpAndActive("TIBD841213HMCRNN01", true)).isInstanceOf(StudentNotFoundException.class);
-		verify(studentRepository).findByCurpAndActive("TIBD841213HMCRNN01", true);
+		verify(studentRepository).findByCurpIgnoreCaseAndActive("TIBD841213HMCRNN01", true);
 	}
 }

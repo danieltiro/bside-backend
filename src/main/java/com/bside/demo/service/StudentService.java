@@ -39,7 +39,13 @@ public class StudentService implements IStudentService {
 
 	@Override
 	public Optional<Student> findByCurpAndActive(String curp, Boolean active) {
-		Optional<Student> optStudent =  studentRepository.findByCurpAndActive(curp, active);
+		Optional<Student> optStudent =  studentRepository.findByCurpIgnoreCaseAndActive(curp, active);
+		return optStudent;
+	}
+	
+	@Override
+	public Optional<Student> findByCurp(String curp) {
+		Optional<Student> optStudent =  studentRepository.findByCurpIgnoreCase(curp);
 		return optStudent;
 	}
 
@@ -50,7 +56,7 @@ public class StudentService implements IStudentService {
 
 	@Override
 	public Page<Student> findByNameAndLastnameAndActive(String name, String lastname, Boolean active, Pageable pageable) {
-		return studentRepository.findByNameAndLastnameAndActive(name, lastname, active, pageable);
+		return studentRepository.findByNameIgnoreCaseAndLastnameIgnoreCaseAndActive(name, lastname, active, pageable);
 	}
 
 	@Transactional

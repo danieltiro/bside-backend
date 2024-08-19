@@ -13,7 +13,8 @@ import com.bside.demo.entity.Student;
 
 @Repository
 public interface IStudentRepository extends PagingAndSortingRepository<Student, UUID>, JpaRepository<Student, UUID> {
-	Optional<Student> findByCurpAndActive(String curp, Boolean active);
+	Optional<Student> findByCurpIgnoreCase(String curp);
+	Optional<Student> findByCurpIgnoreCaseAndActive(String curp, Boolean active);
 	Page<Student> findByNameContainingIgnoreCaseAndActive(String name, Boolean active, Pageable pageable);
-	Page<Student> findByNameAndLastnameAndActive(String name, String lastname, Boolean active, Pageable pageable);
+	Page<Student> findByNameIgnoreCaseAndLastnameIgnoreCaseAndActive(String name, String lastname, Boolean active, Pageable pageable);
 }

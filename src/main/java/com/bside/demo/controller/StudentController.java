@@ -38,6 +38,7 @@ import com.bside.demo.entity.Attachment;
 import com.bside.demo.entity.Student;
 import com.bside.demo.exception.StudentAlreadyExistsException;
 import com.bside.demo.exception.StudentArgumentNotValidException;
+import com.bside.demo.exception.StudentDataIntegrityViolationException;
 import com.bside.demo.exception.StudentNotFoundException;
 import com.bside.demo.service.IStudentService;
 
@@ -70,8 +71,7 @@ public class StudentController {
 	@PostMapping()
 	@ResponseStatus(value = HttpStatus.CREATED)
 	public Student create(@Valid @RequestBody Student entity){
-		
-		Student student = studentService.findByCurpAndActive(entity.getCurp(), true).orElse(null);
+		Student student = studentService.findByCurp(entity.getCurp()).orElse(null);
 		if (student != null) {
 			throw new StudentAlreadyExistsException("Student already exists with curp: " + entity.getCurp());
 		}
@@ -85,12 +85,10 @@ public class StudentController {
     			@RequestPart(required = false, value = "key") String key,
     			@RequestPart(required = false, value = "description") String description
     		) {
-		
-		Student student = studentService.findByCurpAndActive(entity.getCurp(), true).orElse(null);
+		Student student = studentService.findByCurp(entity.getCurp()).orElse(null);
 		if (student != null) {
 			throw new StudentAlreadyExistsException("Student already exists with curp: " + entity.getCurp());
 		}
-		
 		return new ResponseEntity<>(studentService.saveWithAttachments(entity, files, key, description), HttpStatus.CREATED);
 	}
 	
@@ -138,7 +136,7 @@ public class StudentController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 		headers.setBearerAuth(token);
-		headers.set("x-sandbox", "true");
+		//headers.set("x-sandbox", "true");
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 		if (response.getStatusCode() == HttpStatus.OK) {

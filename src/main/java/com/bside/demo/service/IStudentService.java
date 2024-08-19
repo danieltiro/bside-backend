@@ -11,6 +11,7 @@ import com.bside.demo.entity.Student;
 
 public interface IStudentService{
 	Optional<Student> findByCurpAndActive(String curp, Boolean active);
+	Optional<Student> findByCurp(String curp);
 	Page<Student> findByNameAndActive(String name, Boolean active, Pageable pageable);
 	Page<Student> findByNameAndLastnameAndActive(String name, String lastname, Boolean active, Pageable pageable);
 	Student save(Student student);

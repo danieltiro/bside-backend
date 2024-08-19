@@ -3,6 +3,7 @@ package com.bside.demo.exception;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.antlr.v4.runtime.atn.ErrorInfo;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
@@ -29,6 +32,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(exception.getMessage());
+    }
+	
+	@ExceptionHandler({StudentDataIntegrityViolationException.class})
+	public ResponseEntity<Object> duplicateEmailException(HttpServletRequest req, StudentDataIntegrityViolationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
     }
 
 	@Override
